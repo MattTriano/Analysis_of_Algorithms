@@ -60,28 +60,33 @@ def read_file_into_list(filename):
     point_list = []
     for line in file:
         coords = line.split()
-        # point = Point(coords[0], coords[1])
-        point = (int(coords[0]), int(coords[1]))
+        point = Point(coords[0], coords[1])
+        # point = (int(coords[0]), int(coords[1]))
         point_list.append(point)
     return point_list
 
 
 def print_point_list(point_list):
     for point in point_list:
-        # print("(" + str(point.x_coord) + ", " + str(point.y_coord) + ")")
-        print("(" + str(point[0]) + ", " + str(point[1]) + ")")
+        print("(" + str(point.x_coord) + ", " + str(point.y_coord) + ")")
+        # print("(" + str(point[0]) + ", " + str(point[1]) + ")")
 
 def brute_force_check(point_set):
-    x0 = point_set[0][0], y0 = point_set[0][1]
-    x1 = point_set[1][0], y1 = point_set[1][1]
-    x2 = point_set[2][0], y2 = point_set[2][1]
-    dist_p0p1 = sqrt((x0 - x1) ^ 2 + (y0 - y1) ^ 2)
-    dist_p1p2 = sqrt((x1 - x2) ^ 2 + (y1 - y2) ^ 2)
-    dist_p0p2 = sqrt((x0 - x2) ^ 2 + (y0 - y2) ^ 2)
-    closest_pair = dist_p0p1
-    if dist_p0p2 < closest_pair:
-        return ()
-
+    # x0 = point_set[0][0], y0 = point_set[0][1]
+    # x1 = point_set[1][0], y1 = point_set[1][1]
+    # x2 = point_set[2][0], y2 = point_set[2][1]
+    # dist_p0p1 = sqrt((x0 - x1) ^ 2 + (y0 - y1) ^ 2)
+    # dist_p1p2 = sqrt((x1 - x2) ^ 2 + (y1 - y2) ^ 2)
+    # dist_p0p2 = sqrt((x0 - x2) ^ 2 + (y0 - y2) ^ 2)
+    dist_p0p1 = point_set[0].dist(point_set[1])
+    dist_p0p2 = point_set[0].dist(point_set[2])
+    dist_p1p2 = point_set[1].dist(point_set[2])
+    if dist_p0p1 <= dist_p0p2 and dist_p0p1 <= dist_p1p2:
+        return point_set[0], point_set[1] #dist_p0p1
+    elif dist_p0p2 <= dist_p1p2:
+        return point_set[0], point_set[2]
+    else:
+        return point_set[1], point_set[2]
 
 
 
@@ -89,18 +94,14 @@ def main():
     point_list = read_file_into_list("10points.txt")
     sorted_by_x = sorted(point_list, key=lambda point: point.x_coord)
     sorted_by_y = sorted(point_list, key=lambda point: point.y_coord)
-
-    # sorted_by_x = sorted(point_list, key=lambda point: point[0])
-    # sorted_by_y = sorted(point_list, key=lambda point: point[1])
     print_point_list(point_list)
     print("Now for the sorted_by_x list")
     print_point_list(sorted_by_x)
     print("Now for the sorted_by_y list")
     print_point_list(sorted_by_y)
     print("y[0] = " + str(sorted_by_y[0]))
-    print("y[0][0] = " + str(sorted_by_y[0][0]))
-    print("y[0][1] = " + str(sorted_by_y[0][1]))
-
+    print("brute force check vals: " + str(sorted_by_y[0:3]))
+    print("brute force check: " + str(brute_force_check(sorted_by_y[0:3])))
 
 
 if __name__ == "__main__":
