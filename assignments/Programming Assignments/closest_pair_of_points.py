@@ -2,6 +2,8 @@ import string
 import sys
 from heapq import merge
 
+from math import sqrt
+
 
 class Point:
     def __init__(self, x_coord, y_coord):
@@ -10,6 +12,11 @@ class Point:
 
     def __repr__(self):
         return repr((self.x_coord, self.y_coord))
+
+    def dist(self, other):
+        dx = self.x_coord - other.x_coord
+        dy = self.y_coord - other.y_coord
+        return sqrt(dx**2 + dy**2)
 
 
 # Takes a list, list_a, and returns a sorted list.
@@ -64,19 +71,35 @@ def print_point_list(point_list):
         # print("(" + str(point.x_coord) + ", " + str(point.y_coord) + ")")
         print("(" + str(point[0]) + ", " + str(point[1]) + ")")
 
+def brute_force_check(point_set):
+    x0 = point_set[0][0], y0 = point_set[0][1]
+    x1 = point_set[1][0], y1 = point_set[1][1]
+    x2 = point_set[2][0], y2 = point_set[2][1]
+    dist_p0p1 = sqrt((x0 - x1) ^ 2 + (y0 - y1) ^ 2)
+    dist_p1p2 = sqrt((x1 - x2) ^ 2 + (y1 - y2) ^ 2)
+    dist_p0p2 = sqrt((x0 - x2) ^ 2 + (y0 - y2) ^ 2)
+    closest_pair = dist_p0p1
+    if dist_p0p2 < closest_pair:
+        return ()
+
+
+
 
 def main():
     point_list = read_file_into_list("10points.txt")
-    # sorted_by_x = sorted(point_list, key=lambda point: point.x_coord)
-    # sorted_by_y = sorted(point_list, key=lambda point: point.y_coord)
+    sorted_by_x = sorted(point_list, key=lambda point: point.x_coord)
+    sorted_by_y = sorted(point_list, key=lambda point: point.y_coord)
 
-    sorted_by_x = sorted(point_list, key=lambda point: point[0])
-    sorted_by_y = sorted(point_list, key=lambda point: point[1])
+    # sorted_by_x = sorted(point_list, key=lambda point: point[0])
+    # sorted_by_y = sorted(point_list, key=lambda point: point[1])
     print_point_list(point_list)
     print("Now for the sorted_by_x list")
     print_point_list(sorted_by_x)
     print("Now for the sorted_by_y list")
     print_point_list(sorted_by_y)
+    print("y[0] = " + str(sorted_by_y[0]))
+    print("y[0][0] = " + str(sorted_by_y[0][0]))
+    print("y[0][1] = " + str(sorted_by_y[0][1]))
 
 
 
