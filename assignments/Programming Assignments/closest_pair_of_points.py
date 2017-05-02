@@ -94,20 +94,31 @@ def closest_pair_in_body(x_sorted, y_sorted):
         return brute_force_check(x_sorted)
     else:
         mid = len(x_sorted) // 2
-        x_sorted_left = x_sorted[:mid - 1]
+        x_sorted_left = x_sorted[:mid]
         x_sorted_right = x_sorted[mid:]
         y_sorted_left, y_sorted_right = [], []
+        mid_x_val = x_sorted_left[len(x_sorted_left)-1].x_coord
         for point in y_sorted:
-            if point.x_coord <= mid:
+            if point.x_coord <= mid_x_val:
                 y_sorted_left.append(point)
             else:
                 y_sorted_right.append(point)
         (left_candidate_pt1, left_candidate_pt2, delta_left) = closest_pair_in_body(x_sorted_left, y_sorted_left)
         (right_candidate_pt1, right_candidate_pt2, delta_right) = closest_pair_in_body(x_sorted_right, y_sorted_right)
         if delta_left <= delta_right:
-            return left_candidate_pt1, left_candidate_pt2, delta_left
+            candidate = closest_pair_over_edges(left_candidate_pt1, left_candidate_pt2, delta_left, y_sorted)
         else:
-            return right_candidate_pt1, right_candidate_pt2, delta_right
+            candidate = closest_pair_over_edges(right_candidate_pt1, right_candidate_pt2, delta_right, y_sorted)
+        
+
+
+def closest_pair_over_edges(point1, point2, delta_p1p2, y_sorted):
+    close_points = []
+    for point in y_sorted:
+        if abs(point.x_coord - mid_x_val) < candidate[2]:
+            close_points.append(point)
+    num_closer_pts = len(close_points)
+
 
 # todo: finish timer
 # def algo_timer(point_list):
