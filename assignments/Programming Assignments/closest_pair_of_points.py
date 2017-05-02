@@ -2,7 +2,8 @@ import string
 import sys
 from heapq import merge
 
-from math import sqrt
+import math
+# from math import sqrt, inf
 
 
 class Point:
@@ -16,7 +17,7 @@ class Point:
     def dist(self, other):
         dx = self.x_coord - other.x_coord
         dy = self.y_coord - other.y_coord
-        return sqrt(dx**2 + dy**2)
+        return math.sqrt(dx**2 + dy**2)
 
 
 # Takes a list, list_a, and returns a sorted list.
@@ -72,21 +73,71 @@ def print_point_list(point_list):
 
 def brute_force_check(point_set):
     dist_p0p1 = point_set[0].dist(point_set[1])
-    dist_p0p2 = point_set[0].dist(point_set[2])
-    dist_p1p2 = point_set[1].dist(point_set[2])
-    if dist_p0p1 <= dist_p0p2 and dist_p0p1 <= dist_p1p2:
-        return dist_p0p1, point_set[0], point_set[1]
-    elif dist_p0p2 <= dist_p1p2:
-        return dist_p0p2, point_set[0], point_set[2]
+    if len(point_set) == 3:
+        dist_p0p2 = point_set[0].dist(point_set[2])
+        dist_p1p2 = point_set[1].dist(point_set[2])
+        if dist_p0p1 <= dist_p0p2 and dist_p0p1 <= dist_p1p2:
+            return point_set[0], point_set[1], dist_p0p1
+        elif dist_p0p2 <= dist_p1p2:
+            return point_set[0], point_set[2], dist_p0p2
+        else:
+            return point_set[1], point_set[2], dist_p1p2
     else:
-        return dist_p1p2, point_set[1], point_set[2]
+        return point_set[0], point_set[1], dist_p0p1
 
+
+def closest_pair_in_body(x_sorted, y_sorted):
+    list_length = len(x_sorted)
+    if list_length <= 1:
+        return x_sorted[0], None, math.inf
+    elif list_length <= 3:
+        return brute_force_check(x_sorted)
+    else:
+        mid = len(x_sorted) // 2
+        x_sorted_left = x_sorted[:mid - 1]
+        x_sorted_right = x_sorted[mid:]
+        y_sorted_left, y_sorted_right = [], []
+        for point in y_sorted:
+            if point.x_coord <= mid:
+                y_sorted_left.append(point)
+            else:
+                y_sorted_right.append(point)
+        (left_candidate_pt1, left_candidate_pt2, delta_left) = closest_pair_in_body(x_sorted_left, y_sorted_left)
+        (right_candidate_pt1, right_candidate_pt2, delta_right) = closest_pair_in_body(x_sorted_right, y_sorted_right)
+        if delta_left <= delta_right:
+            return left_candidate_pt1, left_candidate_pt2, delta_left
+        else:
+            return right_candidate_pt1, right_candidate_pt2, delta_right
+
+# todo: finish timer
+# def algo_timer(point_list):
+#     n = len(point_list)
+#     print('For input size n = ' + str(n) + ', the algorithm took  ' + str()
+
+
+def closest_pair(n):
+    if n == 10:
+        point_list = read_file_into_list("10points.txt")
+    elif n == 100:
+        point_list = read_file_into_list("100points.txt")
+    elif n == 1000:
+        point_list = read_file_into_list("1000points.txt")
+    else:
+        print("Invalid number entered, enter 10, 100, or 1000 next time. ")
+        print("We'll use the 10 point list this time. ")
+        point_list = read_file_into_list("10points.txt")
+    x_sorted = sorted(point_list, key=lambda point: point.x_coord)
+    y_sorted = sorted(point_list, key=lambda point: point.y_coord)
+    (point1, point2, delta_p1p2) = closest_pair_in_body(x_sorted, y_sorted)
+    print("Closest Points are " + str(point1) + " and " + str(point2) +
+          ", which are separated by distance " + str(delta_p1p2))
 
 
 def main():
-    point_list = read_file_into_list("10points.txt")
-    sorted_by_x = sorted(point_list, key=lambda point: point.x_coord)
-    sorted_by_y = sorted(point_list, key=lambda point: point.y_coord)
+    # point_list = read_file_into_list("10points.txt")
+    # sorted_by_x = sorted(point_list, key=lambda point: point.x_coord)
+    # sorted_by_y = sorted(point_list, key=lambda point: point.y_coord)
+    closest_pair(10)
 
 
     # print("brute force check vals: " + str(sorted_by_y[0:3]))
