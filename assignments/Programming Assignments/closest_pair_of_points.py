@@ -1,11 +1,9 @@
-import string
 import sys
 from heapq import merge
-
 import math
-# from math import sqrt, inf
 
 
+# This class creates points as well as implements the distance calculation
 class Point:
     def __init__(self, x_coord, y_coord):
         self.x_coord = int(x_coord)
@@ -21,6 +19,9 @@ class Point:
 
 
 # Takes a list, list_a, and returns a sorted list.
+# I'm not sure if we're expected to implement merge sort.  I half implemented
+# this merge sort when working through assignment 1, but I used an existing
+# Python merge() function
 def merge_sort(list_a, index):
     if len(list_a) < 2:
         return list_a
@@ -56,6 +57,9 @@ def merge_sort(list_a, index):
 #             return list("something went wrong", "real wrong")
 
 
+# This function takes a filename for a text file containing points in the
+#   format of the test files, and reads that file into a list of points.
+# This function returns that list of points
 def read_file_into_list(filename):
     file = open(filename, 'r')
     point_list = []
@@ -66,11 +70,14 @@ def read_file_into_list(filename):
     return point_list
 
 
+# This was a helper method I made to print out points. I used it for debugging.
 def print_point_list(point_list):
     for point in point_list:
         print("(" + str(point.x_coord) + ", " + str(point.y_coord) + ")")
 
 
+# This function takes a set of 2 or 3 points. Through brute force,
+# this function calculates and returns the closest points and their distance
 def brute_force_check(point_set):
     dist_p0p1 = point_set[0].dist(point_set[1])
     if len(point_set) == 3:
@@ -86,6 +93,7 @@ def brute_force_check(point_set):
         return point_set[0], point_set[1], dist_p0p1
 
 
+# This function takes the sorted lists of points and
 def closest_pair_in_body(x_sorted, y_sorted):
     list_length = len(x_sorted)
     if list_length <= 1:
@@ -106,18 +114,27 @@ def closest_pair_in_body(x_sorted, y_sorted):
         (left_candidate_pt1, left_candidate_pt2, delta_left) = closest_pair_in_body(x_sorted_left, y_sorted_left)
         (right_candidate_pt1, right_candidate_pt2, delta_right) = closest_pair_in_body(x_sorted_right, y_sorted_right)
         if delta_left <= delta_right:
-            candidate = closest_pair_over_edges(left_candidate_pt1, left_candidate_pt2, delta_left, y_sorted)
+            (point1, point2, delta_min) = (left_candidate_pt1, left_candidate_pt2, delta_left)
         else:
-            candidate = closest_pair_over_edges(right_candidate_pt1, right_candidate_pt2, delta_right, y_sorted)
-        
-
-
-def closest_pair_over_edges(point1, point2, delta_p1p2, y_sorted):
-    close_points = []
-    for point in y_sorted:
-        if abs(point.x_coord - mid_x_val) < candidate[2]:
-            close_points.append(point)
-    num_closer_pts = len(close_points)
+            (point1, point2, delta_min) = (right_candidate_pt1, right_candidate_pt2, delta_right)
+        close_points = []
+        for point in y_sorted:
+            if abs(point.x_coord - mid_x_val) < delta_min:
+                close_points.append(point)
+        num_closer_pts = len(close_points)
+        if num_closer_pts > 1:
+            for i in range(num_closer_pts):
+                if num_closer_pts - i > 7:
+                    possible_points = close_points[i+1:i+8]
+                else:
+                    possible_points = close_points[i+1:]
+                for point in possible_points:
+                    this_delta = close_points[i].dist(point)
+                    if this_delta < delta_min:
+                        delta_min = this_delta
+                        point1 = close_points[i]
+                        point2 = point
+        return point1, point2, delta_min
 
 
 # todo: finish timer
@@ -126,6 +143,9 @@ def closest_pair_over_edges(point1, point2, delta_p1p2, y_sorted):
 #     print('For input size n = ' + str(n) + ', the algorithm took  ' + str()
 
 
+# This function is a wrapper that will run the algorithm on the preferred
+# data set.  It takes the number of data points (10, 100, or 1000) for the
+# sample data sets.
 def closest_pair(n):
     if n == 10:
         point_list = read_file_into_list("10points.txt")
@@ -145,14 +165,9 @@ def closest_pair(n):
 
 
 def main():
-    # point_list = read_file_into_list("10points.txt")
-    # sorted_by_x = sorted(point_list, key=lambda point: point.x_coord)
-    # sorted_by_y = sorted(point_list, key=lambda point: point.y_coord)
     closest_pair(10)
-
-
-    # print("brute force check vals: " + str(sorted_by_y[0:3]))
-    # print("brute force check: " + str(brute_force_check(sorted_by_y[0:3])))
+    closest_pair(100)
+    closest_pair(1000)
 
 
 if __name__ == "__main__":
