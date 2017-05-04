@@ -1,6 +1,11 @@
+# Matt Triano's Programming Assignment #1 for CSC 421
+# I am using the interpreter from Python version 3.5.2 and
+# the Anaconda Python distribution
+
 import sys
-from heapq import merge
+import time
 import math
+from heapq import merge
 
 
 # This class creates points as well as implements the distance calculation
@@ -93,10 +98,12 @@ def brute_force_check(point_set):
         return point_set[0], point_set[1], dist_p0p1
 
 
-# This function takes the sorted lists of points and
-def closest_pair_in_body(x_sorted, y_sorted):
+# This function takes 2 lists, one list is the set of points P sorted by x-coordinates
+# and the other list is P sorted by y-coordinates.
+# This function returns the closest pair of points found
+def closest_pair_algo(x_sorted, y_sorted):
     list_length = len(x_sorted)
-    if list_length <= 1:
+    if list_length <= 1:                        # If there's only 1 point, this returns infinite distance
         return x_sorted[0], None, math.inf
     elif list_length <= 3:
         return brute_force_check(x_sorted)
@@ -106,17 +113,19 @@ def closest_pair_in_body(x_sorted, y_sorted):
         x_sorted_right = x_sorted[mid:]
         y_sorted_left, y_sorted_right = [], []
         mid_x_val = x_sorted_left[len(x_sorted_left)-1].x_coord
-        for point in y_sorted:
+        for point in y_sorted:                  # This divides the sorted y-array
             if point.x_coord <= mid_x_val:
                 y_sorted_left.append(point)
             else:
                 y_sorted_right.append(point)
-        (left_candidate_pt1, left_candidate_pt2, delta_left) = closest_pair_in_body(x_sorted_left, y_sorted_left)
-        (right_candidate_pt1, right_candidate_pt2, delta_right) = closest_pair_in_body(x_sorted_right, y_sorted_right)
+        (left_candidate_pt1, left_candidate_pt2, delta_left) = closest_pair_algo(x_sorted_left, y_sorted_left)
+        (right_candidate_pt1, right_candidate_pt2, delta_right) = closest_pair_algo(x_sorted_right, y_sorted_right)
         if delta_left <= delta_right:
             (point1, point2, delta_min) = (left_candidate_pt1, left_candidate_pt2, delta_left)
         else:
             (point1, point2, delta_min) = (right_candidate_pt1, right_candidate_pt2, delta_right)
+
+        # The following block checks for pairs over the seems between divided regions
         close_points = []
         for point in y_sorted:
             if abs(point.x_coord - mid_x_val) < delta_min:
@@ -137,12 +146,6 @@ def closest_pair_in_body(x_sorted, y_sorted):
         return point1, point2, delta_min
 
 
-# todo: finish timer
-# def algo_timer(point_list):
-#     n = len(point_list)
-#     print('For input size n = ' + str(n) + ', the algorithm took  ' + str()
-
-
 # This function is a wrapper that will run the algorithm on the preferred
 # data set.  It takes the number of data points (10, 100, or 1000) for the
 # sample data sets.
@@ -159,15 +162,26 @@ def closest_pair(n):
         point_list = read_file_into_list("10points.txt")
     x_sorted = sorted(point_list, key=lambda point: point.x_coord)
     y_sorted = sorted(point_list, key=lambda point: point.y_coord)
-    (point1, point2, delta_p1p2) = closest_pair_in_body(x_sorted, y_sorted)
-    print("Closest Points are " + str(point1) + " and " + str(point2) +
-          ", which are separated by distance " + str(delta_p1p2))
+    return closest_pair_algo(x_sorted, y_sorted)
+
+
+# This is a timer function which measures the function's runtime for a given input size n
+def algo_timer(n):
+    start = time.time()
+    (point1, point2, delta_p1p2) = closest_pair(n)
+    end = time.time()
+    runtime = round((end - start)*1000, 3)
+    print('For the data set with input size n = ' + str(n) + ', the closest points are ' + str(point1) + ' and '
+          + str(point2) + ',')
+    print('     which are separated by distance ' + str(round(delta_p1p2, 4)) + ' units. The algorithm took '
+          + str(runtime) + ' milliseconds to run.')
+    print('-----------------------------------------------------------------------------------------------------')
 
 
 def main():
-    closest_pair(10)
-    closest_pair(100)
-    closest_pair(1000)
+    algo_timer(10)
+    algo_timer(100)
+    algo_timer(1000)
 
 
 if __name__ == "__main__":
