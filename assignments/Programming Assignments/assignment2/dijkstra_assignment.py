@@ -38,7 +38,7 @@ class Vertex:
     def get_adjacent_vertices(self):
         return self.adj.keys()
 
-    def get_adjacent_weight(self, adj_node):
+    def get_edge_weight(self, adj_node):
         return self.adj[adj_node]
 
     def add_adjacent(self, adjacent, edge_weight=0):
@@ -49,7 +49,7 @@ class Vertex:
         adj = []
         pretty_adj = []
         for adj_node in self.get_adjacent_vertices():
-            adj.append(str(adj_node) + ' (dist = ' + str(self.get_adjacent_weight(adj_node)) + ')')
+            adj.append(str(adj_node) + ' (dist = ' + str(self.get_edge_weight(adj_node)) + ')')
         num_adj = len(adj)
         if num_adj > 0:
             pretty_adj.append(' is adjacent to ')
@@ -98,9 +98,6 @@ class Graph:
         self.vertices[node_a].add_adjacent(self.vertices[node_b], pair_dist)
         self.vertices[node_b].add_adjacent(self.vertices[node_a], pair_dist)
 
-    def get_vertices(self):
-        return self.vertices
-
 
 def file_loader(filename):
     f = open(filename, 'r')
@@ -135,25 +132,42 @@ def graph_printer(graph):
         node.adj_print()
 
 
+def relax(node_tail, node_head):
+    relaxed_path_dist = node_tail.get_path_dist() + node_tail.get_edge_weight(node_head)
+    if node_head.get_path_dist() > relaxed_path_dist:
+        node_head.set_path_dist(relaxed_path_dist)
+        node_head.set_prev(node_tail)
+
+
 def shortest_path_dijkstras(graph_filename, start_node, end_node):
     graph = make_graph(graph_filename)
     graph.get_vertex(start_node).set_path_dist(0)
     unexplored_node_heap = []
-    for node_id in graph:
+    shortest_path = []
+    for node_id in graph.get_vertices():
         node = graph.get_vertex(node_id)
         # unexplored_node_heap.append((node, node.get_path_dist()))
         unexplored_node_heap.append(node)
     heapify(unexplored_node_heap)
+    # shortest_path.append(heappop(unexplored_node_heap))
     while unexplored_node_heap:
         node_u = heappop(unexplored_node_heap)
         node_u.set_explored()
-    print('hi')
+        shortest_path.append(node_u)
+
+        for adj_node in node_u.get_adjacent_vertices():
+            if not adj_node.explored:
+                relax(node_u, adj_node)
+
+    return shortest_path
+
+
 
 
 def main():
     # graph_data1 = make_graph('Case1.txt')
     # graph_printer(graph_data1)
-    shortest_path_dijkstras('Case1.txt', 'A', 'B')
+    path = shortest_path_dijkstras('Case1.txt', 'A', 'B')
     # graph_data_printer(graph_data1)
     print('hi')
 
