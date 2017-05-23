@@ -11,6 +11,12 @@ class Vertex:
         self.adj = {}
         self.explored = False
 
+    def __repr__(self):
+        return 'Vertex ' + str(self.id)
+
+    def __lt__(self, other):
+        return self.get_path_dist() < other.get_path_dist()
+
     def get_id(self):
         return self.id
 
@@ -38,8 +44,6 @@ class Vertex:
     def add_adjacent(self, adjacent, edge_weight=0):
         self.adj[adjacent] = edge_weight
 
-    def __repr__(self):
-        return 'Vertex ' + str(self.id)
 
     def adj_print(self):
         adj = []
@@ -67,8 +71,8 @@ class Graph:
         self.vertices = {}
         self.num_vertices = 0
 
-    def __init__(self):
-        return iter(self.vertices)
+    def __iter__(self):
+        return iter(self.get_vertices())
 
     def get_vertices(self):
         return self.vertices
@@ -135,9 +139,14 @@ def shortest_path_dijkstras(graph_filename, start_node, end_node):
     graph = make_graph(graph_filename)
     graph.get_vertex(start_node).set_path_dist(0)
     unexplored_node_heap = []
-    for node in graph:
-        unexplored_node_heap.append((node, node.get_path_dist()))
+    for node_id in graph:
+        node = graph.get_vertex(node_id)
+        # unexplored_node_heap.append((node, node.get_path_dist()))
+        unexplored_node_heap.append(node)
     heapify(unexplored_node_heap)
+    while unexplored_node_heap:
+        node_u = heappop(unexplored_node_heap)
+        node_u.set_explored()
     print('hi')
 
 
