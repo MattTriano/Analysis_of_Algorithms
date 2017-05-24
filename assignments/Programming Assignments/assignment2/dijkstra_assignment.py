@@ -154,12 +154,15 @@ def shortest_path_dijkstras(graph_filename, start_node, end_node):
         node_u = heappop(unexplored_node_heap)
         node_u.set_explored()
         shortest_path.append(node_u)
+        if shortest_path[-1] == graph.get_vertex(end_node):
+            return shortest_path
 
         for adj_node in node_u.get_adjacent_vertices():
             if not adj_node.explored:
                 relax(node_u, adj_node)
+        heapify(unexplored_node_heap)
 
-    return shortest_path
+    return None
 
 
 
@@ -169,6 +172,7 @@ def main():
     # graph_printer(graph_data1)
     path = shortest_path_dijkstras('Case1.txt', 'A', 'B')
     # graph_data_printer(graph_data1)
+    print(str(path))
     print('hi')
 
 
