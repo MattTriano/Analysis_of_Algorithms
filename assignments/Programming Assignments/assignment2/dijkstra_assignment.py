@@ -6,7 +6,7 @@ from heapq import heapify, heappop
 class Vertex:
     def __init__(self, node):
         self.id = node
-        self.pi = None
+        self.prev = None
         self.path_dist = sys.maxsize  # an approximation for infinity
         self.adj = {}
         self.explored = False
@@ -27,10 +27,10 @@ class Vertex:
         self.path_dist = dist
 
     def get_prev(self):
-        return self.pi
+        return self.prev
 
     def set_prev(self, prev):
-        self.pi = prev
+        self.prev = prev
 
     def set_explored(self):
         self.explored = True
@@ -96,7 +96,7 @@ class Graph:
         if node_b not in self.vertices:
             self.add_vertex(node_b)
         self.vertices[node_a].add_adjacent(self.vertices[node_b], pair_dist)
-        self.vertices[node_b].add_adjacent(self.vertices[node_a], pair_dist)
+        # self.vertices[node_b].add_adjacent(self.vertices[node_a], pair_dist)
 
 
 def file_loader(filename):
@@ -143,19 +143,17 @@ def shortest_path_dijkstras(graph_filename, start_node, end_node):
     graph = make_graph(graph_filename)
     graph.get_vertex(start_node).set_path_dist(0)
     unexplored_node_heap = []
-    shortest_path = []
+    # shortest_path = []
     for node_id in graph.get_vertices():
         node = graph.get_vertex(node_id)
-        # unexplored_node_heap.append((node, node.get_path_dist()))
         unexplored_node_heap.append(node)
     heapify(unexplored_node_heap)
-    # shortest_path.append(heappop(unexplored_node_heap))
     while unexplored_node_heap:
         node_u = heappop(unexplored_node_heap)
         node_u.set_explored()
-        shortest_path.append(node_u)
-        if shortest_path[-1] == graph.get_vertex(end_node):
-            return shortest_path
+        # shortest_path.append(node_u)
+        if node_u == graph.get_vertex(end_node):
+            return graph
 
         for adj_node in node_u.get_adjacent_vertices():
             if not adj_node.explored:
@@ -165,14 +163,28 @@ def shortest_path_dijkstras(graph_filename, start_node, end_node):
     return None
 
 
+def path_printer(graph, end_node):
+    path = []
+    node = graph.get_vertex(end_node)
+    path_length = node.get_path_dist()
+    while node:
+        path.extend(node.get_id())
+        if node.get_prev():
+            path.extend(' ')
+        node = node.get_prev()
+    path = path.reverse()
+    path = ''.join(path)
+    print(path_length)
+    print(path)
+
 
 
 def main():
     # graph_data1 = make_graph('Case1.txt')
     # graph_printer(graph_data1)
     path = shortest_path_dijkstras('Case1.txt', 'A', 'B')
+    path_printer(path, 'B')
     # graph_data_printer(graph_data1)
-    print(str(path))
     print('hi')
 
 
